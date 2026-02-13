@@ -1,8 +1,9 @@
 #!/home/derrick/venv/bin/python3
 
+from re import search
+
 from mailbox import mbox
 from os import path
-from re import search
 from subprocess import run
 
 
@@ -39,27 +40,34 @@ def cleanup():
 
 
 def locate_customer(address: str):
-    from routers import routers
+    from juniper.routers import routers
     from juniper.mx import MX
+    from calix.cx_detail import cx
 
-    for ip, hostname in routers:
+    for ip, hostname in routers.items():
         junos = MX(ip, hostname)
         binding = junos.connection.send_command_timing(
             f"show dhcp relay binding {address}")
         if "BOUND" in binding:
-            print('Customer located')
+            print(f"Customer located on {hostname}")
             break
     circuit_id = junos.connection.send_command_timing(
         f"show subscribers detail address {address} | match Circuit")
+    e9 = circuit_id.split(':')[1].lstrip()
+    ont_id = search(r'\d{3,5}$', circuit_id.split(':')[2].rstrip('\n'))
+    customer = cx(e9, ont_id.group())
+    em = customer.get('locations')[0].get('contacts')[0].get('email').lower()
+    return em
 
 
-addresses = set()
-for message in mbox(MAILDIR):
-    if 'Notice of Claimed Infringement' in message['subject']:
-        files = extract_attachments(message)
-        for file in files:
-            address = parse_ip(file)
-            addresses.add(address)
-for ip in addresses:
-    print(ip)
-cleanup()
+if __name__ == "__main__":
+    addresses = set()
+    for message in mbox(MAILDIR):
+        if 'Notice of Claimed Infringement' in message['subject']:
+            files = extract_attachments(message)
+            for file in files:
+                address = parse_ip(file)
+                addresses.add(address)
+    emails = [locate_customer(ip) for ip in addresses]
+    print(emails)
+    cleanup()
