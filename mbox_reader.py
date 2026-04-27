@@ -40,32 +40,35 @@ def cleanup():
 
 
 def locate_customer(address: str):
-    from juniper.routers import routers
-    from juniper.mx import MX
+    # from juniper.routers import routers
+    # from juniper.mx import MX
     from calix.cx_detail import cx
+    from calix.smx_search import search_all
 
-    for ip, hostname in routers.items():
-        junos = MX(ip, hostname)
-        print(f"Checking {hostname}...")
-        binding = junos.connection.send_command_timing(
-            f"show dhcp relay binding {address} detail")
-        print(binding)
-        if "BOUND" in binding:
-            print(f"Customer located on {hostname}")
-            circuit_id = junos.connection.send_command_timing(f"show subscribers detail address {address} | match Circuit")
-            if circuit_id == '':
-                print(f"No circuit id listed for address {address}")
-                continue
-            e9 = circuit_id.split(':')[1].lstrip()
-            ont_id = search(r'\d{3,5}$', circuit_id.split(':')[2].rstrip('\n'))
-            customer = cx(e9, ont_id.group())
-            if customer is not None:
-                em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
-                print(f"{address}, {em}")
-                return em
-            else:
-                print(f"No customer information available for address {address}")
-                return
+    query = search_all(address)
+
+    # for ip, hostname in routers.items():
+    #    junos = MX(ip, hostname)
+    #    print(f"Checking {hostname}...")
+    #    binding = junos.connection.send_command_timing(
+    #        f"show dhcp relay binding {address} detail")
+    #    print(binding)
+    #    if "BOUND" in binding:
+    #        print(f"Customer located on {hostname}")
+    #        circuit_id = junos.connection.send_command_timing(f"show subscribers detail address {address} | match Circuit")
+    #        if circuit_id == '':
+    #            print(f"No circuit id listed for address {address}")
+    #            continue
+    #        e9 = circuit_id.split(':')[1].lstrip()
+    #        ont_id = search(r'\d{3,5}$', circuit_id.split(':')[2].rstrip('\n'))
+    #        customer = cx(e9, ont_id.group())
+    #        if customer is not None:
+    #            em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
+    #            print(f"{address}, {em}")
+    #            return em
+    #        else:
+    #            print(f"No customer information available for address {address}")
+    #            return
 
 
 def parse_messages():
