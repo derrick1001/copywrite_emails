@@ -5,7 +5,7 @@ This script automates the lookup process of an IP address that we have received 
 ## Table of Contents
 ### Installation
 	- Clone the repo 
-		https://github.com/derrick1001/copyright_emails.git
+		https://github.com/derrick1001/copywrite_emails.git
 	
 ### Usage
 	- By default, this script is using thunderbird as a client. You can edit the compose_email function in the 
