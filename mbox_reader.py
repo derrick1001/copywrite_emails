@@ -3,11 +3,16 @@
 from datetime import datetime as dt
 from re import search
 from time import sleep
-import logging
-
 from mailbox import mbox
 from os import path
 from subprocess import run
+import logging
+
+
+# Set global variables
+MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Copyright'
+WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
+LOGDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/'
 
 
 # LOGGING CONFIGURATION
@@ -21,17 +26,12 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 console_handler.setFormatter(formatter)
 
-file_handler = logging.FileHandler(f"copyright_{dt.now().strftime("%m-%d-%y_%H:%M:%S")}.log", "w")
+file_handler = logging.FileHandler(f"{LOGDIR}copyright_{dt.now().strftime("%m-%d-%y_%H:%M:%S")}.log", "w")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
-
-
-# Set global variables
-MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Copyright'
-TEMPDIR = '/home/derrick/.local/share/derrick/default/projects/copyright_emails/'
 
 
 def extract_attachments(message):
@@ -40,7 +40,7 @@ def extract_attachments(message):
             continue
         fname = part.get_filename()
         if fname:
-            filepath = path.join(TEMPDIR, fname)
+            filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
                 with open(filepath, 'wb') as f:
                     f.write(part.get_payload(decode=True))
