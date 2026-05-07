@@ -40,7 +40,7 @@ def extract_attachments(message) -> Generator:
         if part.get_content_maintype() == 'multipart':
             continue
         fname = part.get_filename()
-        logger.info(f"Found {fname}...")
+        logger.info(f"Found {fname}\n")
         if fname:
             filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
@@ -55,7 +55,7 @@ def parse_ip(filename):
         for line in f:
             match = search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', line)
             if match:
-                logger.info(f"Parsed {match.group()} from {filename}...")
+                logger.info(f"Parsed {match.group()} from {filename}\n")
                 return match.group()
 
 
@@ -66,9 +66,9 @@ def parse_sub(response: str):
 
 
 def cleanup():
-    logger.info(f"Removing all .xml files from {WORKDIR}...")
+    logger.info(f"Removing all .xml files from {WORKDIR}\n")
     run('rm *.xml', shell=True)
-    logger.info(f"Removing parsed messages from {MAILDIR}")
+    logger.info(f"Removing parsed messages from {MAILDIR}\n")
     run(f"echo '' > {MAILDIR}", shell=True)
 
 
@@ -82,13 +82,13 @@ def locate_customer(address: str):
     else:
         logger.critical(f"Got {response.status_code}, exiting")
     e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', data)
-    logger.info(f"Matched {e9} from {data}")
+    logger.info(f"Matched {e9} from {data}\n")
     ont_id = search(r'\(\d{2,5}', data)
-    logger.info(f"Matched {ont_id} from {data}")
+    logger.info(f"Matched {ont_id} from {data}\n")
     customer = cx(e9.group(), ont_id.group().lstrip('('))
     if customer is not None:
         em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
-        logger.info(f"Matched {address} to customer {em}")
+        logger.info(f"Matched {address} to customer {em}\n")
         sleep(1)
         return em
     else:
@@ -103,26 +103,27 @@ def parse_messages():
     for message in mbox(MAILDIR):
         if 'Notice of Claimed Infringement' in message['subject']:
             files = extract_attachments(message)
-            logger.info(f"Extracted {files}...")
             for file in files:
+                logger.info(f"Extracted {file}\n")
                 address = parse_ip(file)
                 sleep(1)
                 addresses.append(address)
-                logger.info(f"Added {address} to {addresses}...")
+                logger.info(f"Added {address} to {addresses.__name__}\n")
                 attachments.append(file)
-                logger.info(f"Added {file} to {attachments}...")
-    logger.info(f"Returning {addresses}\n{attachments}")
+                logger.info(f"Added {file} to {attachments.__name__}\n")
+    logger.info(f"Returning {addresses} {attachments} from {parse_messages.__name__}\n")
     return addresses, attachments
 
 
 def get_emails(addresses: list) -> list:
     emails = [locate_customer(ip) for ip in addresses]
-    logger.info(f"Returning {emails}...")
+    logger.info(f"Returning {emails}\n")
     return emails
 
 
 def compose_email(emails: list, attachments: list):
     from copyright_body import body
+    logger.info(f"Creating {len(emails)} to be sent\n")
     for email, attachment in zip(emails, attachments):
         run(['thunderbird', '-compose', f"to={email},subject='Notice of Claimed Infringement',body={body},attachment={attachment}"])
 
@@ -131,12 +132,12 @@ if __name__ == "__main__":
     addresses, attachments = parse_messages()
     emails = get_emails(addresses)
     for email, attachment in zip(emails, attachments):
-        logger.info(f"{email} will be attached with {attachment.split('/')[9]}")
+        logger.info(f"{email} will be attached with {attachment.split('/')[9]}\n")
         sleep(1)
-    logger.info(f"Composing emails to be sent to {emails}")
+    logger.info(f"Composing emails to be sent to {emails}\n")
     compose_email(emails, attachments)
     clean_dir = input("Cleanup? ")
     if clean_dir == 'y':
-        logger.info(f"Running {cleanup.__name__}")
+        logger.info(f"Running {cleanup.__name__}\n")
         cleanup()
     logger.info("Done, exiting")
