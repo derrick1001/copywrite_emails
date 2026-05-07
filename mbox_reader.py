@@ -40,7 +40,7 @@ def extract_attachments(message) -> Generator:
         if part.get_content_maintype() == 'multipart':
             continue
         fname = part.get_filename()
-        logger.INFO(f"Found {fname}...")
+        logger.info(f"Found {fname}...")
         if fname:
             filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
@@ -55,7 +55,7 @@ def parse_ip(filename):
         for line in f:
             match = search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', line)
             if match:
-                logger.INFO(f"Parsed {match.group()} from {filename}...")
+                logger.info(f"Parsed {match.group()} from {filename}...")
                 return match.group()
 
 
@@ -99,11 +99,11 @@ def locate_customer(address: str):
 def parse_messages():
     addresses = []
     attachments = []
-    logging.INFO(f"Parsing {MAILDIR}...")
+    logging.info(f"Parsing {MAILDIR}...")
     for message in mbox(MAILDIR):
         if 'Notice of Claimed Infringement' in message['subject']:
             files = extract_attachments(message)
-            logger.INFO(f"Extracted {files}...")
+            logger.info(f"Extracted {files}...")
             for file in files:
                 address = parse_ip(file)
                 sleep(1)
