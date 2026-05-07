@@ -108,9 +108,9 @@ def parse_messages():
                 address = parse_ip(file)
                 sleep(1)
                 addresses.append(address)
-                logger.info(f"Added {address} to {addresses.__name__}")
+                logger.info(f'Added {address} to {type(addresses)} {addresses=}.split("=")[0]')
                 attachments.append(file)
-                logger.info(f"Added {file} to {attachments.__name__}")
+                logger.info(f'Added {file} to {attachments=}.split("=")[0]')
     logger.info(f"Returning {addresses} {attachments} from {parse_messages.__name__}")
     return addresses, attachments
 
