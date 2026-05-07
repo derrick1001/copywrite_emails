@@ -1,5 +1,6 @@
 #!/home/derrick/venv/bin/python3
 
+from typing import Generator
 from datetime import datetime as dt
 from re import search
 from time import sleep
@@ -34,11 +35,12 @@ logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 
-def extract_attachments(message):
+def extract_attachments(message) -> Generator:
     for part in message.walk():
         if part.get_content_maintype() == 'multipart':
             continue
         fname = part.get_filename()
+        logger.INFO(f"Found {fname}...")
         if fname:
             filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
@@ -53,6 +55,7 @@ def parse_ip(filename):
         for line in f:
             match = search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', line)
             if match:
+                logger.INFO(f"Parsed {match.group()} from {filename}...")
                 return match.group()
 
 
@@ -63,8 +66,10 @@ def parse_sub(response: str):
 
 
 def cleanup():
-    rm = run('rm *.xml', shell=True)
-    return rm
+    logger.info(f"Removing all .xml files from {WORKDIR}...")
+    run('rm *.xml', shell=True)
+    logger.info(f"Removing parsed messages from {MAILDIR}")
+    run(f"echo '' > {MAILDIR}", shell=True)
 
 
 def locate_customer(address: str):
@@ -74,36 +79,45 @@ def locate_customer(address: str):
     response = search_all(address)
     if response.status_code == 200:
         data = response.json()[0].get('desc')
+    else:
+        logger.critical(f"Got {response.status_code}, exiting")
     e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', data)
+    logger.info(f"Matched {e9} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
+    logger.info(f"Matched {ont_id} from {data}")
     customer = cx(e9.group(), ont_id.group().lstrip('('))
     if customer is not None:
         em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
-        print(f"{address}, {em}")
+        logger.info(f"Matched {address} to customer {em}")
         sleep(1)
         return em
     else:
-        print(f"No customer information available for address {address}")
+        logger.critical(f"No customer information found in {customer}")
         return
 
 
 def parse_messages():
     addresses = []
     attachments = []
+    logging.INFO(f"Parsing {MAILDIR}...")
     for message in mbox(MAILDIR):
         if 'Notice of Claimed Infringement' in message['subject']:
             files = extract_attachments(message)
+            logger.INFO(f"Extracted {files}...")
             for file in files:
                 address = parse_ip(file)
-                print(f"Parsed {address}")
                 sleep(1)
                 addresses.append(address)
+                logger.info(f"Added {address} to {addresses}...")
                 attachments.append(file)
+                logger.info(f"Added {file} to {attachments}...")
+    logger.info(f"Returning {addresses}\n{attachments}")
     return addresses, attachments
 
 
 def get_emails(addresses: list) -> list:
     emails = [locate_customer(ip) for ip in addresses]
+    logger.info(f"Returning {emails}...")
     return emails
 
 
@@ -117,13 +131,12 @@ if __name__ == "__main__":
     addresses, attachments = parse_messages()
     emails = get_emails(addresses)
     for email, attachment in zip(emails, attachments):
-        print(f"\n{email}, {attachment.split('/')[9]}")
+        logger.info(f"{email} will be attached with {attachment.split('/')[9]}")
         sleep(1)
+    logger.info(f"Composing emails to be sent to {emails}")
     compose_email(emails, attachments)
-    print(f'\nSleeping for {len(addresses)} seconds')
-    sleep(len(addresses))
-    send_emails = input("Done sending mail?: ")
-    if send_emails == 'y':
-        print('Cleaning up...')
+    clean_dir = input("Cleanup? ")
+    if clean_dir == 'y':
+        logger.info(f"Running {cleanup.__name__}")
         cleanup()
-    print('Done')
+    logger.info("Done, exiting")
