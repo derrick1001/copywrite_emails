@@ -23,15 +23,15 @@ formatter = logging.Formatter(fmt="%(levelname)s %(asctime)s: %(message)s (Line:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-console_handler.setFormatter(formatter)
+# console_handler = logging.StreamHandler()
+# console_handler.setLevel(logging.DEBUG)
+# console_handler.setFormatter(formatter)
 
 file_handler = logging.FileHandler(f"{LOGDIR}copyright_{dt.now().strftime("%m-%d-%y_%H:%M:%S")}.log", "w")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
-logger.addHandler(console_handler)
+# logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 
@@ -82,9 +82,9 @@ def locate_customer(address: str):
     else:
         logger.critical(f"Got {response.status_code}, exiting")
     e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', data)
-    logger.info(f"Matched {e9} from {data}")
+    logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
-    logger.info(f"Matched {ont_id} from {data}")
+    logger.info(f"Matched {ont_id.group()} from {data}")
     customer = cx(e9.group(), ont_id.group().lstrip('('))
     if customer is not None:
         em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
