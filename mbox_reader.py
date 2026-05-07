@@ -10,7 +10,7 @@ import logging
 
 
 # Set global variables
-MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Copyright'
+MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
 LOGDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/'
 
