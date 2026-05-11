@@ -23,15 +23,15 @@ formatter = logging.Formatter(fmt="%(levelname)s %(asctime)s: %(message)s (Line:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# console_handler = logging.StreamHandler()
-# console_handler.setLevel(logging.DEBUG)
-# console_handler.setFormatter(formatter)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+console_handler.setFormatter(formatter)
 
 file_handler = logging.FileHandler(f"{LOGDIR}copyright_{dt.now().strftime("%m-%d-%y_%H:%M:%S")}.log", "w")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
-# logger.addHandler(console_handler)
+logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 
@@ -41,7 +41,7 @@ def extract_attachments(message) -> Generator:
             continue
         fname = part.get_filename()
         if fname:
-            logger.info(f"Found {fname} in {part}")
+            logger.info(f"Found {fname}")
             filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
                 with open(filepath, 'wb') as f:
