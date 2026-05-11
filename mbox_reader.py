@@ -46,7 +46,7 @@ def extract_attachments(message) -> Generator:
             if not path.isfile(filepath):
                 with open(filepath, 'wb') as f:
                     f.write(part.get_payload(decode=True))
-                    logger.info(f"Saved {f} in {WORKDIR}")
+                    logger.info(f"Saved {filepath} in {WORKDIR}")
                 yield filepath
 
 
@@ -81,7 +81,7 @@ def locate_customer(address: str):
         data = response.json()[0].get('desc')
     else:
         logger.critical(f"Got {response.status_code}, exiting")
-    e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', data)
+    e9 = search(r'[A-Z][A-Za-z\-]{2,11}-E9-1', data)
     logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
     logger.info(f"Matched {ont_id.group().lstrip('(')} from {data}")
