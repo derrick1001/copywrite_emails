@@ -40,14 +40,14 @@ def extract_attachments(message) -> Generator:
         if part.get_content_maintype() == 'multipart':
             continue
         fname = part.get_filename()
-        logger.info(f"Found {fname}")
         if fname:
+            logger.info(f"Found {fname} in {part}")
             filepath = path.join(WORKDIR, fname)
             if not path.isfile(filepath):
                 with open(filepath, 'wb') as f:
                     f.write(part.get_payload(decode=True))
+                    logger.info(f"Saved {f} in {WORKDIR}")
                 yield filepath
-                # print(f"Saved: {filepath}")
 
 
 def parse_ip(filename):
@@ -55,14 +55,14 @@ def parse_ip(filename):
         for line in f:
             match = search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', line)
             if match:
-                logger.info(f"Parsed {match.group()} from {filename}")
+                logger.info(f"Parsed {match.group()} from {filename.split('/')[-1]}")
                 return match.group()
 
 
-def parse_sub(response: str):
-    e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', response)
-    ont_id = search(r'\(\d{2,5}', response)
-    return e9.group(), ont_id.group().lstrip('(')
+# def parse_sub(response: str):
+#    e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', response)
+#    ont_id = search(r'\(\d{2,5}', response)
+#    return e9.group(), ont_id.group().lstrip('(')
 
 
 def cleanup():
@@ -84,7 +84,7 @@ def locate_customer(address: str):
     e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', data)
     logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
-    logger.info(f"Matched {ont_id.group()} from {data}")
+    logger.info(f"Matched {ont_id.group().lstrip('(')} from {data}")
     customer = cx(e9.group(), ont_id.group().lstrip('('))
     if customer is not None:
         em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
@@ -99,12 +99,12 @@ def locate_customer(address: str):
 def parse_messages():
     addresses = []
     attachments = []
-    logging.info(f"Parsing {MAILDIR}...")
+    logger.info(f"Parsing {MAILDIR}")
     for message in mbox(MAILDIR):
         if 'Notice of Claimed Infringement' in message['subject']:
             files = extract_attachments(message)
             for file in files:
-                logger.info(f"Extracted {file}")
+                logger.info(f"Extracted {file.split('/')[-1]}")
                 address = parse_ip(file)
                 sleep(1)
                 addresses.append(address)
@@ -123,7 +123,7 @@ def get_emails(addresses: list) -> list:
 
 def compose_email(emails: list, attachments: list):
     from copyright_body import body
-    logger.info(f"Creating {len(emails)} to be sent")
+    logger.info(f"Creating {len(emails)} email(s) to be sent")
     for email, attachment in zip(emails, attachments):
         run(['thunderbird', '-compose', f"to={email},subject='Notice of Claimed Infringement',body={body},attachment={attachment}"])
 
