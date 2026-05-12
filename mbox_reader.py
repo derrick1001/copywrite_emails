@@ -46,7 +46,7 @@ def extract_attachments(message) -> Generator:
             if not path.isfile(filepath):
                 with open(filepath, 'wb') as f:
                     f.write(part.get_payload(decode=True))
-                    logger.info(f"Saved {filepath} in {WORKDIR}")
+                    logger.info(f"Saved {fname} in {WORKDIR}")
                 yield filepath
 
 
@@ -80,7 +80,7 @@ def locate_customer(address: str):
     if response.status_code == 200:
         data = response.json()[0].get('desc')
     else:
-        logger.critical(f"Got {response.status_code}, exiting")
+        logger.error(f"Got {response.status_code}, exiting")
     e9 = search(r'[A-Z][A-Za-z\-]{2,11}-E9-1', data)
     logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
@@ -104,7 +104,6 @@ def parse_messages():
         if 'Notice of Claimed Infringement' in message['subject']:
             files = extract_attachments(message)
             for file in files:
-                logger.info(f"Extracted {file.split('/')[-1]}")
                 address = parse_ip(file)
                 sleep(1)
                 addresses.append(address)
@@ -123,7 +122,6 @@ def get_emails(addresses: list) -> list:
 
 def compose_email(emails: list, attachments: list):
     from copyright_body import body
-    logger.info(f"Creating {len(emails)} email(s) to be sent")
     for email, attachment in zip(emails, attachments):
         run(['thunderbird', '-compose', f"to={email},subject='Notice of Claimed Infringement',body={body},attachment={attachment}"])
 
@@ -131,7 +129,7 @@ def compose_email(emails: list, attachments: list):
 if __name__ == "__main__":
     addresses, attachments = parse_messages()
     emails = get_emails(addresses)
-    for email, attachment in zip(emails, attachments):
+    for email, address, attachment in zip(emails, addresses, attachments):
         logger.info(f"{email} will be attached with {attachment.split('/')[9]}")
         sleep(1)
     logger.info(f"Composing emails to be sent to {emails}")
