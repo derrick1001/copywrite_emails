@@ -14,6 +14,7 @@ import logging
 MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
 LOGDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/'
+OFFENDERS = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/offenders/tracked.txt'
 
 
 # LOGGING CONFIGURATION
@@ -124,6 +125,14 @@ def compose_email(emails: list, attachments: list):
     from copyright_body import body
     for email, attachment in zip(emails, attachments):
         run(['thunderbird', '-compose', f"to={email},subject='Notice of Claimed Infringement',body={body},attachment={attachment}"])
+        track(email)
+        logger.info(f"{email} written to {OFFENDERS}")
+
+
+def track(emails: list) -> None:
+    with open(OFFENDERS, 'a') as f:
+        for email in emails:
+            f.write(email)
 
 
 if __name__ == "__main__":
