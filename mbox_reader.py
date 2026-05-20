@@ -80,7 +80,7 @@ def locate_customer(address: str):
     from calix.smx_search import search_all
 
     response = search_all(address)
-    if response.status_code == 200:
+    if response.status_code == 200 and response.json() != []:
         logger.info(f"Response from SMx query was {response.json()}")
         data = response.json()[0].get('desc')
     else:
