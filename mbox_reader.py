@@ -13,7 +13,7 @@ import logging
 # Set global variables
 MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
-LOGDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/'
+LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%y")}'
 OFFENDERS = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/offenders/tracked.txt'
 
 
@@ -28,7 +28,7 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 console_handler.setFormatter(formatter)
 
-file_handler = logging.FileHandler(f"{LOGDIR}copyright_{dt.now().strftime("%m-%d-%y_%H:%M:%S")}.log", "w")
+file_handler = logging.FileHandler(f"{LOGDIR}copyright_{dt.now().strftime("%m-%d_%H:%M:%S")}.log", "w")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 

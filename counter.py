@@ -1,9 +1,10 @@
 counts = {}
-emails = ["null@null.com", "someone@somewhere.com", "null@null.com"]
+with open('tracked.txt', 'r') as f:
+    emails = [email.rstrip('\n') for email in f]
 
-print('Emails:', emails)
+print(f'Emails: {emails}\n')
 
-print('Counting...')
 for email in emails:
     counts[email] = counts.get(email, 0) + 1
-print('Counts', counts)
+
+print(f'Counts: {counts}')
