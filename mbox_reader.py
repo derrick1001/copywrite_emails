@@ -84,8 +84,8 @@ def locate_customer(address: str):
         logger.info(f"Response from SMx query was {response.json()}")
         data = response.json()[0].get('desc')
     else:
-        logger.error(f"Got {response.status_code}, exiting")
-        quit(1)
+        logger.error(f"Got {response.status_code}, {response.json()}, exiting")
+        return
     e9 = search(r'[A-Z][A-Za-z\-]{2,11}-E9-1', data)
     logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
