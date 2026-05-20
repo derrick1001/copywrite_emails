@@ -13,7 +13,7 @@ import logging
 # Set global variables
 MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
-LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%y")}/'
+LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%Y")}/'
 if path.isdir(LOGDIR) is False:
     mkdir(LOGDIR)
 OFFENDERS = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/offenders/tracked.txt'
