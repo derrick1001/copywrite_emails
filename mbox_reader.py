@@ -13,7 +13,7 @@ import logging
 # Set global variables
 MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
-LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%y")}'
+LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%y")}/'
 if path.isdir(LOGDIR) is False:
     mkdir(LOGDIR)
 OFFENDERS = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/offenders/tracked.txt'
@@ -84,6 +84,7 @@ def locate_customer(address: str):
         data = response.json()[0].get('desc')
     else:
         logger.error(f"Got {response.status_code}, exiting")
+        quit(1)
     e9 = search(r'[A-Z][A-Za-z\-]{2,11}-E9-1', data)
     logger.info(f"Matched {e9.group()} from {data}")
     ont_id = search(r'\(\d{2,5}', data)
