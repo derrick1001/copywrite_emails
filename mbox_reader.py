@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from re import search
 from time import sleep
 from mailbox import mbox
-from os import path
+from os import path, mkdir
 from subprocess import run
 import logging
 
@@ -14,6 +14,8 @@ import logging
 MAILDIR = '/home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local Folders/Archives.sbd/Copyright'
 WORKDIR = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/'
 LOGDIR = f'/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/logs/{dt.now().strftime("%m_%y")}'
+if path.isdir(LOGDIR) is False:
+    mkdir(LOGDIR)
 OFFENDERS = '/home/derrick/.local/share/derrick/default/python_scripts/copyright_emails/offenders/tracked.txt'
 
 
