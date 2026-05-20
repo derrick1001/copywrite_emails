@@ -81,6 +81,7 @@ def locate_customer(address: str):
 
     response = search_all(address)
     if response.status_code == 200:
+        logger.info(f"Response from SMx query was {response.json()}")
         data = response.json()[0].get('desc')
     else:
         logger.error(f"Got {response.status_code}, exiting")
