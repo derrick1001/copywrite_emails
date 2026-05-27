@@ -62,12 +62,6 @@ def parse_ip(filename):
                 return match.group()
 
 
-# def parse_sub(response: str):
-#    e9 = search(r'[A-Z][a-z\-]{2,11}-E9-1', response)
-#    ont_id = search(r'\(\d{2,5}', response)
-#    return e9.group(), ont_id.group().lstrip('(')
-
-
 def cleanup():
     logger.info(f"Removing all .xml files from {WORKDIR}")
     run('rm *.xml', shell=True)
@@ -93,7 +87,8 @@ def locate_customer(address: str):
     customer = cx(e9.group(), ont_id.group().lstrip('('))
     if customer is not None:
         em = customer.get('locations')[0].get('contacts')[0].get('email', "No email").lower()
-        logger.info(f"Matched {address} to customer {em}")
+        acct = customer.get("customId")
+        logger.info(f"Matched {address} to customer {em} with account number {acct}")
         sleep(1)
         return em
     else:
