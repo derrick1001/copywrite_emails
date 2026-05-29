@@ -66,7 +66,7 @@ def cleanup():
     logger.info(f"Removing all .xml files from {WORKDIR}")
     run('rm *.xml', shell=True)
     logger.info(f"Removing parsed messages from {MAILDIR}")
-    run(f'> {MAILDIR}')
+    run('> /home/derrick/.thunderbird/28rm5iqs.default-release/Mail/Local\ Folders/Archives.sbd/Copyright')
 
 
 def locate_customer(address: str):
