@@ -67,7 +67,7 @@ def cleanup():
     run('rm *.xml', shell=True)
     logger.info(f"Removing parsed messages from {MAILDIR}")
     with open(MAILDIR, 'w') as f:
-        run("cat /dev/null", stdout=f)
+        run("cat /dev/null", stdout=f, shell=True)
 
 
 def locate_customer(address: str):
