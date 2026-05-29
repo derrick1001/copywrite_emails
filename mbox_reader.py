@@ -66,7 +66,7 @@ def cleanup():
     logger.info(f"Removing all .xml files from {WORKDIR}")
     run('rm *.xml', shell=True)
     logger.info(f"Removing parsed messages from {MAILDIR}")
-    run(f"> {MAILDIR}", shell=True)
+    run("cat /dev/null", stdout=f"{MAILDIR}")
 
 
 def locate_customer(address: str):
