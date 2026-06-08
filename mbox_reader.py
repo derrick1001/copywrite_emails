@@ -132,7 +132,7 @@ def compose_email(emails: list, attachments: list) -> None:
 def track(emails: list) -> None:
     with open(OFFENDERS, 'a') as f:
         for email in emails:
-            f.write(email)
+            f.write(f"{email}\n")
 
 
 if __name__ == "__main__":
