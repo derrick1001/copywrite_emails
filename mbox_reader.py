@@ -129,10 +129,9 @@ def compose_email(emails: list, attachments: list) -> None:
         logger.info(f"{email} written to {OFFENDERS}")
 
 
-def track(emails: list) -> None:
+def track(email: str) -> None:
     with open(OFFENDERS, 'a') as f:
-        for email in emails:
-            f.write(f"{email}\n")
+        f.write(f"{email}\n")
 
 
 if __name__ == "__main__":
