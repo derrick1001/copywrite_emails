@@ -53,7 +53,7 @@ def extract_attachments(message) -> Generator:
                 yield filepath
 
 
-def parse_ip(filename):
+def parse_ip(filename) -> str:
     with open(filename, 'r') as f:
         for line in f:
             match = search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', line)
@@ -62,7 +62,7 @@ def parse_ip(filename):
                 return match.group()
 
 
-def cleanup():
+def cleanup() -> None:
     logger.info(f"Removing all .xml files from {WORKDIR}")
     run('rm *.xml', shell=True)
     logger.info(f"Removing parsed messages from {MAILDIR}")
@@ -70,7 +70,7 @@ def cleanup():
         run("cat /dev/null", stdout=f, shell=True)
 
 
-def locate_customer(address: str):
+def locate_customer(address: str) -> str | None:
     from calix.cx_detail import cx
     from calix.smx_search import search_all
 
@@ -97,12 +97,12 @@ def locate_customer(address: str):
         return
 
 
-def parse_messages():
+def parse_messages() -> tuple[list, list]:
     addresses = []
     attachments = []
     logger.info(f"Parsing {MAILDIR}")
     for message in mbox(MAILDIR):
-        if 'Notice of Claimed Infringement' in message['subject']:
+        if 'Infringement' in message['subject']:
             files = extract_attachments(message)
             for file in files:
                 address = parse_ip(file)
@@ -121,7 +121,7 @@ def get_emails(addresses: list) -> list:
     return emails
 
 
-def compose_email(emails: list, attachments: list):
+def compose_email(emails: list, attachments: list) -> None:
     from copyright_body import body
     for email, attachment in zip(emails, attachments):
         run(['thunderbird', '-compose', f"to={email},subject='Notice of Claimed Infringement',body={body},attachment={attachment}"])
