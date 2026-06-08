@@ -1,5 +1,5 @@
 counts = {}
-with open('tracked.txt', 'r') as f:
+with open('offenders/tracked.txt', 'r') as f:
     emails = [email.rstrip('\n') for email in f]
 
 print(f'Emails: {emails}\n')
