@@ -64,7 +64,7 @@ def parse_ip(filename) -> str:
 
 def cleanup() -> None:
     logger.info(f"Removing all .xml files from {WORKDIR}")
-    run('rm *.xml', shell=True)
+    run(f'rm {WORKDIR}/*.xml', shell=True)
     logger.info(f"Removing parsed messages from {MAILDIR}")
     with open(MAILDIR, 'w') as f:
         run("cat /dev/null", stdout=f, shell=True)
